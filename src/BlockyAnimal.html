@@ -1,0 +1,63 @@
+<!--Christopher Moon, ckmoon@ucsc.edu-->
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <title>Draw a point (1)</title>
+  </head>
+
+  <body onload="main()">
+
+    <canvas id="webgl" width="400" height="400">
+    Please use a browser that supports "canvas"
+    </canvas>
+
+
+    <p id="fpsDisplay">Waiting for update...</p>
+
+
+    <div>
+        <div>  Drawing Mode</div>
+
+        <button type = "button" id = "square"> Square </button>
+
+        <button type = "button" id = "triangle"> Triangle </button>
+
+        <button type = "button" id = "circle"> Circle </button>
+
+        <p>
+
+    </div>
+
+
+    <div>
+
+      Camera Angle <input type = "range" min = "0" max = "90" value = "5" class = "slider" id = "angleSlide">
+      neck <input type = "range" min = "-45" max = "45" value = "0" class = "slider" id = "neck">
+      purple <input type = "range" min = "-45" max = "45" value = "0" class = "slider" id = "purpleSlide">
+
+    </div>
+
+
+
+
+
+    <script src="../lib/webgl-utils.js"></script>
+    <script src="../lib/webgl-debug.js"></script>
+    <script src="../lib/cuon-utils.js"></script>
+    <script src="../lib/cuon-matrix-cse160.js"></script>
+
+    <script src = "point.js"></script>
+    <script src = "triangle.js"></script>
+    <script src = "circle.js"></script>
+
+    <script src = "cube.js"></script>
+
+    <script src="BlockyAnimal.js"></script>
+
+  </body>
+
+</html>
