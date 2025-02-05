@@ -76,7 +76,9 @@ function connectVariablesToGLSL(){
   
 //UI globals
 let g_selectedColor = [1,1,1,1];
-let g_globalAngle = 0;
+let g_globalX = 0;
+
+let g_globalY = 0;
 let g_neckAngle = 0;
 let g_hatAngle = 0;
 let g_headAngle = 0;
@@ -99,7 +101,7 @@ function addActionsforHtmlUI(){
     };
     document.getElementById('angleSlide').addEventListener('mousemove', function(){
 
-        g_globalAngle = this.value;
+        g_globalX = this.value;
         renderScene();
 
     });
@@ -127,6 +129,9 @@ function addActionsforHtmlUI(){
 
 }
 
+let g_mouseDown = false;
+let g_lastX = 0;
+let g_lastY = 0;
 
 //main
 function main() {
@@ -137,6 +142,20 @@ function main() {
     connectVariablesToGLSL();
     //HTML ui elements
     addActionsforHtmlUI();
+
+    // Register function (event handler) to be called on a mouse press
+    canvas.onmousedown = click;
+
+    canvas.onmousemove = function(ev){
+
+        if(ev.buttons == 1){
+
+            click(ev);
+
+        }
+
+    };
+
     // Specify the color for clearing <canvas>
     gl.clearColor(0.0, 0.0, 1, 1.0);
     //renderAllShapes();
@@ -144,9 +163,70 @@ function main() {
     requestAnimationFrame(tick);
 }
 
+function convertCoordinatesEventToGL(ev){
+
+    var x = ev.clientX; // x coordinate of a mouse pointer
+    var y = ev.clientY; // y coordinate of a mouse pointer
+    var rect = ev.target.getBoundingClientRect();
+
+    //convert
+    x = ((x - rect.left) - canvas.width/2)/(canvas.width/2);
+    y = (canvas.height/2 - (y - rect.top))/(canvas.height/2);
+
+    return([x,y]);
+
+}
+
+//click
+function click(ev){
+
+    //shift click
+    if(ev.shiftKey){
+
+        let pokeStart = performance.now();
+
+        function pokeAnimation(){
+
+            let elapsed = (performance.now() - pokeStart) / 1000; 
+            
+            if(elapsed < 0.5){
+
+                g_neckAngle = 20 * Math.sin(elapsed * Math.PI * 4); 
+                g_headAngle = 10 * Math.sin(elapsed * Math.PI * 4);
+
+            }else{
+
+                g_neckAngle = 0;
+                g_headAngle = 0;
+                return;
+            }
+            
+            renderScene();
+
+            requestAnimationFrame(pokeAnimation);
+
+        }
+
+        pokeAnimation();
+
+    }else{
+
+        let [x,y] = convertCoordinatesEventToGL(ev);
+        //console.log(x);
+        g_globalX = 360/x;
+
+        g_globalY = 360/y;
+
+
+    }
+
+}
+
+
 var g_startTime = performance.now()/1000
 var g_seconds = performance.now()/1000-g_startTime;
 
+//tick
 function tick(){
 
     g_seconds = performance.now()/1000-g_startTime;
@@ -159,6 +239,7 @@ function tick(){
 
 }
 
+//animation angles
 function updateAnimationAngles(){
 
     if(g_animation){
@@ -183,7 +264,8 @@ var g_sizes = [];
 function renderScene(){
 
     var startTime = performance.now();
-    var globalRotMat = new Matrix4().rotate(g_globalAngle, 0, 1, 0);
+    var globalRotMat = new Matrix4().rotate(g_globalX, 0, 1, 0).rotate(g_globalY, 1, 0, 0); 
+    
     gl.uniformMatrix4fv(u_GlobalRotateMatrix, false, globalRotMat.elements)
     // Clear <canvas>
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -312,3 +394,6 @@ function sendTextToHtml(text, htmlID){
     htmlElm.innerHTML = text;
 
 }
+
+
+
